@@ -5,6 +5,8 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPQLQueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
 import jpabook.querydsl.entity.Member;
 import jpabook.querydsl.entity.QMember;
 import jpabook.querydsl.entity.QTeam;
@@ -236,5 +238,76 @@ public class QuerydslBasicTest {
         assertThat(result)
                 .extracting("username")
                 .containsExactly("teamA", "teamB");
+    }
+
+    /**
+     * 예시) 회원과 팀을 조인하면서, 팀이 teamA인 팀만 조인, 회원은 모든 조회
+     * JPQL : select m, t from Member m left join m.team t on t.name = 'teamA'
+     * inner join 시 where 절이 사용하는 것과 동일한 효과. left join 시에만 on 사용하자.
+     */
+    @Test
+    public void join_on_filtering() {
+        List<Tuple> result = queryFactory.select(member, team)
+                .from(member)
+                .leftJoin(member.team, team).on(team.name.eq("teamA"))
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println("result: " + tuple);
+        }
+    }
+
+    /**
+     * 연관 관계 없는 엔티티 외부 조인
+     * 회원의 이름이 팀 이름과 같은 회원 조회, 회원은 전체 조회
+     */
+    @Test
+    public void join_on_no_relation() {
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+        em.persist(new Member("teamC"));
+
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(team).on(member.username.eq(team.name))
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println("result: " + tuple);
+        }
+    }
+
+    @PersistenceUnit EntityManagerFactory emf;
+
+    @Test
+    public void fetch_join_no() {
+
+        em.flush();
+        em.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1"))
+                .fetchOne();
+
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
+        assertThat(loaded).as("페치 조인 미적용").isFalse();
+    }
+
+    @Test
+    public void fetch_join_use() {
+
+        em.flush();
+        em.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .join(member.team, team).fetchJoin()
+                .where(member.username.eq("member1"))
+                .fetchOne();
+
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
+        assertThat(loaded).as("페치 조인 미적용").isTrue();
     }
 }
