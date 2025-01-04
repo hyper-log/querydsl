@@ -451,4 +451,37 @@ public class QuerydslBasicTest {
             System.out.println("result: " + s);
         }
     }
+
+    /**
+     * 타입 하나
+     */
+    @Test
+    public void simpleProjection() {
+        List<String> result = queryFactory
+                .select(member.username)
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("result: " + s);
+        }
+    }
+
+    /**
+     * 타입 두 개 이상
+     */
+    @Test
+    public void tupleProjection() {
+        // 타입이 두 개 이상일 때, tuple 혹은 Dto 이용
+        List<Tuple> result = queryFactory.select(member.username, member.age)
+                .from(member)
+                .fetch();
+
+        for (Tuple tuple : result) {
+            String username = tuple.get(member.username);
+            Integer age = tuple.get(member.age);
+            System.out.println("username = " + username);
+            System.out.println("age = " + age);
+        }
+    }
 }
