@@ -2,6 +2,7 @@ package jpabook.querydsl;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -384,6 +385,39 @@ public class QuerydslBasicTest {
             System.out.println("result: " + tuple);
         }
 
+    }
+
+    @Test
+    public void basicCase() {
+        List<String> result = queryFactory
+                .select(member.age
+                        .when(10).then("열 살")
+                        .when(20).then("스무 살")
+                        .otherwise("기타"))
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("result: " + s);
+        }
+    }
+
+    @Test
+    public void complexCase() {
+        // DB에서 해당 조건들을 가지고 case 문을 작성할 순 있지만, 프리젠테이션 로직 계층에서 이용하는 것이 낫다.
+        // DB는 데이터를 퍼올리는 것에 집중하자.
+        List<String> result = queryFactory
+                .select(new CaseBuilder()
+                        .when(member.age.between(0, 20)).then("0~20살")
+                        .when(member.age.between(21, 30)).then("21살~30살")
+                        .otherwise("기타")
+                )
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("result: " + s);
+        }
     }
 
 }
