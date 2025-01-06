@@ -500,6 +500,9 @@ public class QuerydslBasicTest {
         }
     }
 
+    /**
+     * DTO 생성자 방식
+     */
     @Test
     public void findDtoSetter() {
         List<MemberDto> result = queryFactory
@@ -514,6 +517,9 @@ public class QuerydslBasicTest {
         }
     }
 
+    /**
+     * DTO 필드 방식 (네임 일치)
+     */
     @Test
     public void findDtoByField() {
         List<MemberDto> result = queryFactory
@@ -528,6 +534,9 @@ public class QuerydslBasicTest {
         }
     }
 
+    /**
+     * DTO 생성자
+     */
     @Test
     public void findDtoByConstructor() {
         List<MemberDto> result = queryFactory
@@ -542,6 +551,9 @@ public class QuerydslBasicTest {
         }
     }
 
+    /**
+     * 필드 네임 불일치 받기 (as 사용, 필드 세터 방식)
+     */
     @Test
     public void findUserDto() {
         QMember memberSub = new QMember("memberSub");
@@ -560,6 +572,9 @@ public class QuerydslBasicTest {
         }
     }
 
+    /**
+     * 필드 네임 불일치 (생성자)
+     */
     @Test
     public void findUserDtoByConstructor() {
         List<UserDto> result = queryFactory
