@@ -501,7 +501,7 @@ public class QuerydslBasicTest {
     }
 
     /**
-     * DTO 생성자 방식
+     * DTO 생성자 방식 (기본 생성자 필수로 있어야 함)
      */
     @Test
     public void findDtoSetter() {
