@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jpabook.querydsl.dto.MemberSearchCondition;
 import jpabook.querydsl.dto.MemberTeamDto;
 import jpabook.querydsl.entity.Member;
+import jpabook.querydsl.entity.QMember;
 import jpabook.querydsl.entity.Team;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static jpabook.querydsl.entity.QMember.member;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -81,5 +83,14 @@ class MemberRepositoryTest {
         Page<MemberTeamDto> result = memberRepository.searchPageSimple(condition, pageRequest);
         assertThat(result.getSize()).isEqualTo(3);
         assertThat(result.getContent()).extracting("username").containsExactly("member1", "member2", "member3");
+    }
+
+    // 조인이 안 된다.
+    @Test
+    public void querydslPredicateExecutorTest() {
+        Iterable<Member> result = memberRepository.findAll(member.age.between(10, 40).and(member.username.eq("member1")));
+        for (Member member : result) {
+            System.out.println("member1 = " + member);
+        }
     }
 }
