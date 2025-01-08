@@ -93,4 +93,6 @@ class MemberRepositoryTest {
             System.out.println("member1 = " + member);
         }
     }
+
+
 }
